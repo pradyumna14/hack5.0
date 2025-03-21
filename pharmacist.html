@@ -3,55 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.2/web3.min.js"></script>
     <title>Fetch Prescription</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #00796B, #004D40);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            margin: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        button {
+            background: #00897B;
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #00BFA5;
+            transform: scale(1.05);
+        }
+
+        .btn-container {
+            margin-top: 20px;
+            margin-bottom: 40px; /* Added margin-bottom */
+        }
+
+        .prescription-details {
+            margin-top: 20px; /* Added margin-top */
+        }
+
+        .btn {
+            text-decoration: none;
+            color: white;
+            background: #00897B;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            border: 2px solid white;
+            transition: all 0.3s ease-in-out;
+            font-weight: 600;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+            margin: 10px 0;
+        }
+
+        .btn:hover {
+            background: #00BFA5;
+            transform: translateY(-3px);
+        }
+    </style>
 </head>
 <body>
-    <h2>Retrieve Prescription from Blockchain</h2>
-    <label for="txHash">Enter Transaction Hash:</label>
-    <input type="text" id="txHash" placeholder="Paste transaction hash here">
-    <button onclick="fetchPrescription()">Fetch Prescription</button>
-    <h3>Prescription Details:</h3>
-    <div id="prescriptionData"></div>
+    <header>
+        <h1>Fetch Prescription</h1>
+    </header>
 
+    <div class="container">
+        <h2>Retrieve Prescription from Blockchain</h2>
+        <input type="text" id="txHash" placeholder="Paste transaction hash here">
+        <button onclick="fetchPrescription()">Fetch Prescription</button>
+        <div class="prescription-details">
+            <h3>Prescription Details:</h3>
+            <div id="prescriptionData"></div>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <a href="index.html" class="btn">Go Back</a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.2/web3.min.js"></script>
     <script>
         const web3 = new Web3("HTTP://127.0.0.1:7545"); // Change RPC if needed
         const contractAddress = "0x0105e5AFC10A97994aF941BaAC20A4373b4e951A";
         const usedTransactions = new Set(JSON.parse(localStorage.getItem("usedTxHashes")) || []);
 
         const abi = [
-    {
-        "anonymous": false,
-        "inputs": [
-            { "indexed": true, "name": "doctor", "type": "address" },
-            { "indexed": false, "name": "proof", "type": "string" },
-            { "indexed": false, "name": "patientName", "type": "string" },
-            { "indexed": false, "name": "medicine", "type": "string" },
-            { "indexed": false, "name": "dosage", "type": "string" },
-            { "indexed": false, "name": "tablets", "type": "uint256" },
-            { "indexed": false, "name": "expiryDate", "type": "string" }
-        ],
-        "name": "PrescriptionStored",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            { "indexed": false, "name": "proof", "type": "string" }
-        ],
-        "name": "PrescriptionDispensed",
-        "type": "event"
-    },
-    {
-        "constant": false,
-        "inputs": [{ "name": "proof", "type": "string" }],
-        "name": "dispensePrescription",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
-];
+            {
+                "anonymous": false,
+                "inputs": [
+                    { "indexed": true, "name": "doctor", "type": "address" },
+                    { "indexed": false, "name": "proof", "type": "string" },
+                    { "indexed": false, "name": "patientName", "type": "string" },
+                    { "indexed": false, "name": "medicine", "type": "string" },
+                    { "indexed": false, "name": "dosage", "type": "string" },
+                    { "indexed": false, "name": "tablets", "type": "uint256" },
+                    { "indexed": false, "name": "expiryDate", "type": "string" }
+                ],
+                "name": "PrescriptionStored",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    { "indexed": false, "name": "proof", "type": "string" }
+                ],
+                "name": "PrescriptionDispensed",
+                "type": "event"
+            },
+            {
+                "constant": false,
+                "inputs": [{ "name": "proof", "type": "string" }],
+                "name": "dispensePrescription",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
 
         const contract = new web3.eth.Contract(abi, contractAddress);
 
@@ -118,29 +247,26 @@
         }
 
         async function dispenseMedicine(proofId, txHash) {
-    try {
-        const accounts = await web3.eth.getAccounts();
-        const userAccount = accounts[0];
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const userAccount = accounts[0];
 
-        const tx = await contract.methods.dispensePrescription(proofId).send({
-            from: userAccount,
-            gas: 300000
-        });
+                const tx = await contract.methods.dispensePrescription(proofId).send({
+                    from: userAccount,
+                    gas: 300000
+                });
 
-        console.log("Dispense Transaction:", tx);
-        alert("Medicine has been dispensed!");
+                console.log("Dispense Transaction:", tx);
+                alert("Medicine has been dispensed!");
 
-        usedTransactions.add(txHash);
-        localStorage.setItem("usedTxHashes", JSON.stringify([...usedTransactions]));
-        document.getElementById("prescriptionData").innerHTML = "";
-    } catch (error) {
-        console.error("Error dispensing medicine:", error);
-        alert("Error processing the prescription.");
-    }
-}
-
-
-
+                usedTransactions.add(txHash);
+                localStorage.setItem("usedTxHashes", JSON.stringify([...usedTransactions]));
+                document.getElementById("prescriptionData").innerHTML = "";
+            } catch (error) {
+                console.error("Error dispensing medicine:", error);
+                alert("Error processing the prescription.");
+            }
+        }
     </script>
 </body>
 </html>

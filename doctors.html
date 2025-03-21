@@ -48,6 +48,10 @@
         button:hover { background-color: #00BFA5; transform: translateY(-3px); }
         p { font-size: 1.2rem; margin-top: 5px; }
         ::placeholder { color: rgba(255, 255, 255, 0.7); }
+        .btn-container {
+            margin-top: 20px;
+            margin-bottom: 40px; /* Added margin-bottom */
+        }
     </style>
 </head>
 <body>
@@ -55,7 +59,6 @@
         <h1>Doctor's Dashboard</h1>
     </header>
     <p>Welcome, Doctor! Create and store a prescription on-chain.</p>
-    <a href="index.html" class="btn">Go Back</a>
 
     <div id="doctor" class="section">
         <h2>Create Prescription</h2>
@@ -71,6 +74,10 @@
         <input type="date" id="expiryDate" placeholder="Prescription Expiry Date">
         <button type="button" id="generateZKProof">Generate & Store Prescription</button>
         <p>Transaction Hash: <span id="txHash">N/A</span></p>
+    </div>
+
+    <div class="btn-container">
+        <a href="index.html" class="btn">Go Back</a>
     </div>
 
     <script>
