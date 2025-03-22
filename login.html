@@ -114,41 +114,39 @@
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
 
     <script>
-      document
-        .getElementById("login-form")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
+     document.querySelector(".form_front .btn").addEventListener("click", async function(event) {
+          event.preventDefault(); // Prevent form from submitting traditionally
 
           if (typeof window.ethereum === "undefined") {
-            alert("MetaMask is not installed. Please install it to continue.");
-            return;
+              alert("MetaMask is not installed. Please install it to continue.");
+              return;
           }
 
           const web3 = new Web3(window.ethereum);
           try {
-            const accounts = await ethereum.request({
-              method: "eth_requestAccounts",
-            });
-            const userAddress = accounts[0];
-            localStorage.setItem("userAddress", userAddress);
+              const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+              const userAddress = accounts[0];
+              localStorage.setItem("userAddress", userAddress);
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const role = urlParams.get("role");
+              // Extract role from URL (e.g., login.html?role=doctor)
+              const urlParams = new URLSearchParams(window.location.search);
+              const role = urlParams.get("role");
 
-            if (role === "doctor") {
-              window.location.href = "doctors.html";
-            } else if (role === "patient") {
-              window.location.href = "patients.html";
-            } else if (role === "pharmacist") {
-              window.location.href = "pharmacist.html";
-            } else {
-              alert("Invalid role. Please login again.");
-            }
+              // Redirect based on role
+              if (role === "doctor") {
+                  window.location.href = "doctors.html";
+              } else if (role === "patient") {
+                  window.location.href = "patients.html";
+              } else if (role === "pharmacist") {
+                  window.location.href = "pharmacist.html";
+              } else {
+                  alert("Invalid role. Please login again.");
+              }
           } catch (error) {
-            console.error("Error logging in:", error);
-            alert("Login failed. Please try again.");
+              console.error("Error logging in:", error);
+              alert("Login failed. Please try again.");
           }
-        });
-    </script>
+      });
+  </script>
   </body>
 </html>
