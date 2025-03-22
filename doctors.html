@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor's Dashboard</title>
-    <link rel="stylesheet" href="styles/main.css" />
+    <!-- <link rel="stylesheet" href="styles/main.css" /> -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body>
     <style>
         * {
             margin: 0;
@@ -47,7 +50,7 @@
 
         .section {
             background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
+            padding: 18px;
             border-radius: 12px;
             backdrop-filter: blur(10px);
             display: flex;
@@ -165,7 +168,7 @@
         <input type="number" id="tabletCount" placeholder="Number of Tablets">
         <input type="date" id="expiryDate" placeholder="Prescription Expiry Date">
         <div class="center-button">
-            <button type="button" id="generateZKProof" class="btn">Generate & Store Prescription</button>
+            <button type="button" id="generateZKProof">Generate & Store Prescription</button>
         </div>
         <p>Transaction Hash: <span id="txHash">N/A</span></p>
     </div>
@@ -176,215 +179,213 @@
 
     <script>
         const CONTRACT_ADDRESS = "0x0105e5AFC10A97994aF941BaAC20A4373b4e951A";
-        const CONTRACT_ABI = [
+        const CONTRACT_ABI = [{
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "proof",
+          "type": "string"
+        }
+      ],
+      "name": "PrescriptionDispensed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "doctor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "proof",
+          "type": "string"
+        }
+      ],
+      "name": "PrescriptionStored",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_proof",
+          "type": "string"
+        },
+        {
+          "components": [
             {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "proof",
-                        "type": "string"
-                    }
-                ],
-                "name": "PrescriptionDispensed",
-                "type": "event"
+              "internalType": "string",
+              "name": "doctorLicense",
+              "type": "string"
             },
             {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "doctor",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "proof",
-                        "type": "string"
-                    }
-                ],
-                "name": "PrescriptionStored",
-                "type": "event"
+              "internalType": "string",
+              "name": "patientName",
+              "type": "string"
             },
             {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_proof",
-                        "type": "string"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "string",
-                                "name": "doctorLicense",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "patientName",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "patientAge",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "patientWeight",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "medicalHistory",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "patientID",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "medicine",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "dosage",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "tablets",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "expiryDate",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "datePrescribed",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "bool",
-                                "name": "isDispensed",
-                                "type": "bool"
-                            }
-                        ],
-                        "internalType": "struct Prescription.PrescriptionData",
-                        "name": "_data",
-                        "type": "tuple"
-                    }
-                ],
-                "name": "storePrescription",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+              "internalType": "uint256",
+              "name": "patientAge",
+              "type": "uint256"
             },
             {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_proof",
-                        "type": "string"
-                    }
-                ],
-                "name": "getPrescription",
-                "outputs": [
-                    {
-                        "components": [
-                            {
-                                "internalType": "string",
-                                "name": "doctorLicense",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "patientName",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "patientAge",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "patientWeight",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "medicalHistory",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "patientID",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "medicine",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "dosage",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "tablets",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "expiryDate",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "datePrescribed",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "bool",
-                                "name": "isDispensed",
-                                "type": "bool"
-                            }
-                        ],
-                        "internalType": "struct Prescription.PrescriptionData",
-                        "name": "",
-                        "type": "tuple"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function",
-                "constant": true
+              "internalType": "uint256",
+              "name": "patientWeight",
+              "type": "uint256"
             },
             {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_proof",
-                        "type": "string"
-                    }
-                ],
-                "name": "dispensePrescription",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+              "internalType": "string",
+              "name": "medicalHistory",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "patientID",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "medicine",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "dosage",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "tablets",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "expiryDate",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "datePrescribed",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "isDispensed",
+              "type": "bool"
             }
-        ]; // Use the full ABI here
+          ],
+          "internalType": "struct Prescription.PrescriptionData",
+          "name": "_data",
+          "type": "tuple"
+        }
+      ],
+      "name": "storePrescription",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_proof",
+          "type": "string"
+        }
+      ],
+      "name": "getPrescription",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "doctorLicense",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "patientName",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "patientAge",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "patientWeight",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "medicalHistory",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "patientID",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "medicine",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "dosage",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "tablets",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "expiryDate",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "datePrescribed",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "isDispensed",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct Prescription.PrescriptionData",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_proof",
+          "type": "string"
+        }
+      ],
+      "name": "dispensePrescription",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }]; // Use the full ABI here
 
         async function generateZKProof() {
             if (!window.ethereum) {
